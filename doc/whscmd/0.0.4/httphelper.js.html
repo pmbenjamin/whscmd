@@ -32,44 +32,44 @@ var _ = require('underscore');
 /**
     Generic HTTPGet class.
     @constructor
-    @param {object} options - Options for the HTTP post.
-    @param {string} options.host - host to send the request to
-    @param {string} options.port - port to send the request to
-    @param {string} options.apikey - apikey to use for the request
-    @param {function} options.logger - logger function to log output to
+    @param {function} logger - logging function (must support verbose, info, etc.)
+    @param {object} config - config for the HTTP post.
+    @param {string} config.host - host to send the request to
+    @param {string} config.port - port to send the request to
+    @param {string} config.apikey - apikey to use for the request
     @param {string} path - URL to perform the GET on.
-    @param {function} formatOutput - function to process JSON output
+    @param {function} formatOutput - callback function to process JSON output
 **/
-function HTTPGet(options, path, formatOutput) {
-    var logger = options.logger;
-
-    /** @property {string} Name of the command invoking the GET. */
-    this.options = {
-        host: options.host,
+function HTTPGet(logger, config, path, formatOutput) {
+    /** @param {object} config - configuration options for the GET. */
+    this.config = {
+        host: config.host,
         rejectUnauthorized: false,
-        port: options.port,
+        port: config.port,
         method: 'GET',
-        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + config.apikey
     };
-    this.logger = options.logger;
+
     /** @method HTTPGet.formatOutput - Output formatter to process data and output accordingly
-        @param {object} data - data, in JSON format, from the GET. **/
+        @param {integer} status - status code from the request
+        @param {object} data - data, in JSON format, from the GET 
+    **/
     this.formatOutput = formatOutput || function(data) {
-        console.log('Listing ' + this.name);
-        console.log(JSON.stringify(data));
+        console.log(data);
     };
+
     /** Execute the get
         @method HTTPGet.execute
         @returns {boolean} true on success, false on error **/
     this.execute = function () {
         var that = this;
-        if (!options.apikey) {
+        if (!config.apikey) {
             logger.error('must supply an API key option (-k)'); 
             return false;
         }
         var responseData = '';
-        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
-        var clientReq = https.request(that.options, function (clientRes) {
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.config));
+        var clientReq = https.request(that.config, function (clientRes) {
             logger.info('StatusCode => ' + clientRes.statusCode);
             logger.info('Headers => ' + JSON.stringify(clientRes.headers));
 
@@ -84,14 +84,8 @@ function HTTPGet(options, path, formatOutput) {
                 if (!responseData) {
                     logger.error('no data returned');
                 } else { 
-                    logger.verbose('raw data => ', responseData)
-                    responseData = JSON.parse(responseData);
-
-                    if (responseData.status) {
-                        logger.error(responseData.message);
-                    } else {
-                        that.formatOutput(responseData);
-                    }
+                    logger.verbose('raw data => ', responseData);
+                    that.formatOutput(clientRes.statusCode, responseData);
                 }
             });
         }).on('error', function (e) {
@@ -106,28 +100,35 @@ function HTTPGet(options, path, formatOutput) {
 /**
     Generic HTTPPost class.
     @constructor
-    @param {object} options - Options for the HTTP post
-    @param {string} options.host - host to send the request to
-    @param {string} options.port - port to send the request to
-    @param {string} options.apikey - apikey to use for the request
-    @param {function} options.logger - logger function to log output to
+    @param {object} config - config for the HTTP post
+    @param {string} config.host - host to send the request to
+    @param {string} config.port - port to send the request to
+    @param {string} config.apikey - apikey to use for the request
     @param {string} path - URL to perform the POST on
+    @param {function} digestResponse - Callback function to process response data
 **/
-function HTTPPost(options, path) {
-    var logger = options.logger;
+function HTTPPost(logger, config, path, digestResponse) {
 
-    /** @property {object} options - options associated with the POST */
-    this.options = {
-        host: options.host,
+    /** @property {object} config - config associated with the POST */
+    this.config = {
+        host: config.host,
         rejectUnauthorized: false,
-        port: options.port,
+        port: config.port,
         method: 'POST',
-        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey,
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + config.apikey,
         headers: {
             'Content-Type': 'application/json',
             'Content-Length': 0,
             'Accept': 'application/json'
         }
+    };
+
+    /** @method HTTPPost.digestResponse - Callback function to process response data
+        @param {integer} status - status code from the request
+        @param {object} data - data, in JSON format, from the GET 
+    **/
+    this.digestResponse = digestResponse || function(status, data) {
+        console.log("Status %d => %s", status, data);
     };
         
     /** Execute the post
@@ -137,16 +138,16 @@ function HTTPPost(options, path) {
     this.execute = function (postData) {
         postData = JSON.stringify(postData);
         var that = this;
-        if (!options.apikey) {
+        if (!config.apikey) {
             logger.error('must supply an API key option (-k)'); 
             return false;
         }
 
-        that.options.headers["Content-Length"] = postData.length;
+        that.config.headers["Content-Length"] = postData.length;
 
         var responseData = '';
-        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
-        var clientReq = https.request(that.options, function (clientRes) {
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.config));
+        var clientReq = https.request(that.config, function (clientRes) {
             logger.info('Status Code => ' + clientRes.statusCode);
             logger.info('Headers => ' + JSON.stringify(clientRes.headers));
 
@@ -158,18 +159,8 @@ function HTTPPost(options, path) {
             // Process the end event.
             clientRes.on('end', function () {
                 logger.info('end received');
-                try {
-                    responseData = JSON.parse(responseData);
-                    if (responseData.message) {
-                        logger.error(responseData.message);
-                        return false;
-                    } else { 
-                        console.log('Response => ', responseData)
-                    }
-                } catch (e) {
-                    logger.error('problem with parsing response => ' + e.message);
-                    return false;                    
-                }
+                logger.verbose('raw data => ', responseData);
+                that.digestResponse(clientRes.statusCode, responseData);
             });
         }).on('error', function (e) {
             logger.error('problem with https request => ' + e.message);
@@ -186,28 +177,36 @@ function HTTPPost(options, path) {
 /**
     Generic HTTPPut class.
     @constructor
-    @param {object} options - Options for the HTTP post
-    @param {string} options.host - host to send the request to
-    @param {string} options.port - port to send the request to
-    @param {string} options.apikey - apikey to use for the request
-    @param {function} options.logger - logger function to log output to
+    @param {function} logger - logging function (must support verbose, info, etc.)
+    @param {object} config - config for the HTTP post
+    @param {string} config.host - host to send the request to
+    @param {string} config.port - port to send the request to
+    @param {string} config.apikey - apikey to use for the request
     @param {string} path - URL to perform the POST on
+    @param {function} digestResponse - Callback function to process response data
 **/
-function HTTPPut(options, path) {
-    var logger = options.logger;
+function HTTPPut(logger, config, path, digestResponse) {
 
-    /** @property {object} options - options associated with the POST */
-    this.options = {
-        host: options.host,
+    /** @property {object} config - config associated with the PUT */
+    this.config = {
+        host: config.host,
         rejectUnauthorized: false,
-        port: options.port,
+        port: config.port,
         method: 'PUT',
-        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey,
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + config.apikey,
         headers: {
             'Content-Type': 'application/json',
             'Content-Length': 0,
             'Accept': 'application/json'
         }
+    };
+ 
+    /** @method HTTPPost.digestResponse - Callback function to process response data
+        @param {integer} status - status code from the request
+        @param {object} data - data, in JSON format, from the GET 
+    **/
+    this.digestResponse = digestResponse || function(status, data) {
+        console.log("Status %d => %s", status, data);
     };
         
     /** Execute the post
@@ -217,16 +216,16 @@ function HTTPPut(options, path) {
     this.execute = function (putData) {
         putData = JSON.stringify(putData);
         var that = this;
-        if (!options.apikey) {
+        if (!config.apikey) {
             logger.error('must supply an API key option (-k)'); 
             return false;
         }
 
-        that.options.headers["Content-Length"] = putData.length;
+        that.config.headers["Content-Length"] = putData.length;
 
         var responseData = '';
-        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
-        var clientReq = https.request(that.options, function (clientRes) {
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.config));
+        var clientReq = https.request(that.config, function (clientRes) {
             logger.info('Status Code => ' + clientRes.statusCode);
             logger.info('Headers => ' + JSON.stringify(clientRes.headers));
 
@@ -238,18 +237,8 @@ function HTTPPut(options, path) {
             // Process the end event.
             clientRes.on('end', function () {
                 logger.info('end received');
-                try {
-                    responseData = JSON.parse(responseData);
-                    if (responseData.message) {
-                        logger.error(responseData.message);
-                        return false;
-                    } else { 
-                        console.log('Response => ', responseData)
-                    }
-                } catch (e) {
-                    logger.error('problem with parsing response => ' + e.message);
-                    return false;                    
-                }
+                logger.verbose('raw data => ', responseData);
+                that.digestResponse(clientRes.statusCode, responseData);
             });
         }).on('error', function (e) {
             logger.error('problem with https request => ' + e.message);
@@ -266,23 +255,22 @@ function HTTPPut(options, path) {
 /**
     Generic HTTPDelete class.
     @constructor
-    @param {object} options - Options for the HTTP post
-    @param {string} options.host - host to send the request to
-    @param {string} options.port - port to send the request to
-    @param {string} options.apikey - apikey to use for the request
-    @param {function} options.logger - logger function to log output to
+    @param {function} logger - logging function (must support verbose, info, etc.)
+    @param {object} config - config for the HTTP post
+    @param {string} config.host - host to send the request to
+    @param {string} config.port - port to send the request to
+    @param {string} config.apikey - apikey to use for the request
     @param {string} path - URL to perform the POST on
+    @param {function} digestResponse - Callback function to process response data
 **/
-function HTTPDelete(options, path) {
-    var logger = options.logger;
-
-    /** @property {object} options - options associated with the POST */
-    this.options = {
-        host: options.host,
+function HTTPDelete(logger, config, path, digestResponse) {
+    /** @property {object} config - config associated with the DELETE */
+    this.config = {
+        host: config.host,
         rejectUnauthorized: false,
-        port: options.port,
+        port: config.port,
         method: 'DELETE',
-        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey,
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + config.apikey,
         headers: {
             'Content-Type': 'application/json',
             'Content-Length': 0,
@@ -290,18 +278,26 @@ function HTTPDelete(options, path) {
         }
     };
         
+    /** @method HTTPPost.digestResponse - Callback function to process response data
+        @param {integer} status - status code from the request
+        @param {object} data - data, in JSON format, from the GET 
+    **/
+    this.digestResponse = digestResponse || function(status, data) {
+        console.log("Status %d => %s", status, data);
+    };
+        
     /** Execute the post
         @method HTTPDelete.execute
         @returns {boolean} true on success, false on error **/
     this.execute = function () {
         var that = this;
-        if (!options.apikey) {
+        if (!config.apikey) {
             logger.error('must supply an API key option (-k)'); 
             return false;
         }
         var responseData = '';
-        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
-        var clientReq = https.request(that.options, function (clientRes) {
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.config));
+        var clientReq = https.request(that.config, function (clientRes) {
             logger.info('Status Code => ' + clientRes.statusCode);
             logger.info('Headers => ' + JSON.stringify(clientRes.headers));
 
@@ -312,14 +308,9 @@ function HTTPDelete(options, path) {
 
             // Process the end event.
             clientRes.on('end', function () {
-                logger.info('end received');
-                try {
-                    responseData = JSON.parse(responseData);
-                    console.log(responseData.message);
-                } catch (e) {
-                    logger.error('problem with parsing response => ' + e.message);
-                    return false;                    
-                }
+                logger.info('End received');
+                logger.verbose('raw data => ', responseData);
+                that.digestResponse(clientRes.statusCode, responseData);
             });
         }).on('error', function (e) {
             logger.error('problem with https request => ' + e.message);
@@ -344,13 +335,13 @@ exports.del = HTTPDelete;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#outputCustomApplication">outputCustomApplication</a></li><li><a href="global.html#outputCustomPolicies">outputCustomPolicies</a></li><li><a href="global.html#pre">pre</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#appList">appList</a></li><li><a href="global.html#appRoute">appRoute</a></li><li><a href="global.html#pre">pre</a></li><li><a href="global.html#siteList">siteList</a></li><li><a href="global.html#siteRoute">siteRoute</a></li><li><a href="global.html#userList">userList</a></li><li><a href="global.html#userRoute">userRoute</a></li><li><a href="global.html#vulnClassList">vulnClassList</a></li><li><a href="global.html#vulnClassRoute">vulnClassRoute</a></li><li><a href="global.html#vulnPolicyApply">vulnPolicyApply</a></li><li><a href="global.html#vulnPolicyCreate">vulnPolicyCreate</a></li><li><a href="global.html#vulnPolicyDelete">vulnPolicyDelete</a></li><li><a href="global.html#vulnPolicyFetch">vulnPolicyFetch</a></li><li><a href="global.html#vulnPolicyList">vulnPolicyList</a></li><li><a href="global.html#vulnPolicyRoute">vulnPolicyRoute</a></li><li><a href="global.html#vulnPolicyUpdate">vulnPolicyUpdate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Fri Feb 27 2015 12:56:56 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 11 2015 10:38:27 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

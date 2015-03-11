@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: HTTPGet</title>
+    <title>JSDoc: Class: HTTPDelete</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: HTTPGet</h1>
+    <h1 class="page-title">Class: HTTPDelete</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2>
-        HTTPGet
+        HTTPDelete
         </h2>
         
     
@@ -42,14 +42,14 @@
 
     
 
-    <h4 class="name" id="HTTPGet"><span class="type-signature"></span>new HTTPGet<span class="signature">(options, path, formatOutput)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="HTTPDelete"><span class="type-signature"></span>new HTTPDelete<span class="signature">(logger, config, path, digestResponse)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Generic HTTPGet class.
+    Generic HTTPDelete class.
 </div>
 
 
@@ -85,7 +85,30 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>logger</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">logging function (must support verbose, info, etc.)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
             
 
             <td class="type">
@@ -101,33 +124,14 @@
 
             
 
-            <td class="description last">Options for the HTTP post.
-                <h6>Properties</h6>
-                
+            <td class="description last">config for the HTTP post</td>
+        </tr>
 
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>host</code></td>
+                <td class="name"><code>config.host</code></td>
             
 
             <td class="type">
@@ -150,7 +154,7 @@
 
         <tr>
             
-                <td class="name"><code>port</code></td>
+                <td class="name"><code>config.port</code></td>
             
 
             <td class="type">
@@ -173,7 +177,7 @@
 
         <tr>
             
-                <td class="name"><code>apikey</code></td>
+                <td class="name"><code>config.apikey</code></td>
             
 
             <td class="type">
@@ -196,36 +200,6 @@
 
         <tr>
             
-                <td class="name"><code>logger</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">logger function to log output to</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>path</code></td>
             
 
@@ -242,14 +216,14 @@
 
             
 
-            <td class="description last">URL to perform the GET on.</td>
+            <td class="description last">URL to perform the POST on</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>formatOutput</code></td>
+                <td class="name"><code>digestResponse</code></td>
             
 
             <td class="type">
@@ -265,7 +239,7 @@
 
             
 
-            <td class="description last">function to process JSON output</td>
+            <td class="description last">Callback function to process response data</td>
         </tr>
 
     
@@ -306,7 +280,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line15">line 15</a>
+        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line238">line 238</a>
     </li></ul></dd>
     
 
@@ -350,7 +324,7 @@
 
         
             
-<h4 class="name" id="options"><span class="type-signature"></span>options<span class="type-signature"></span></h4>
+<h4 class="name" id="config"><span class="type-signature"></span>config<span class="type-signature"></span></h4>
 
 
 
@@ -387,13 +361,13 @@
 
         <tr>
             
-                <td class="name"><code>Name</code></td>
+                <td class="name"><code>config</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -403,7 +377,7 @@
 
             
 
-            <td class="description last">of the command invoking the GET.</td>
+            <td class="description last">config associated with the DELETE</td>
         </tr>
 
     
@@ -442,7 +416,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line19">line 19</a>
+        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line240">line 240</a>
     </li></ul></dd>
     
 
@@ -476,7 +450,7 @@
 
 
 <div class="description">
-    Execute the get
+    Execute the post
 </div>
 
 
@@ -520,7 +494,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line33">line 33</a>
+        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line261">line 261</a>
     </li></ul></dd>
     
 
@@ -569,133 +543,6 @@
 
 
         
-            
-
-    
-
-    <h4 class="name" id=".formatOutput-Outputformattertoprocessdataandoutputaccordingly"><span class="type-signature">(static) </span>formatOutput - Output formatter to process data and output accordingly<span class="signature">(data)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">data, in JSON format, from the GET.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="httphelper.js.html">httphelper.js</a>, <a href="httphelper.js.html#line27">line 27</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
     
 
     
@@ -711,13 +558,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#outputCustomApplication">outputCustomApplication</a></li><li><a href="global.html#outputCustomPolicies">outputCustomPolicies</a></li><li><a href="global.html#pre">pre</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#appList">appList</a></li><li><a href="global.html#appRoute">appRoute</a></li><li><a href="global.html#pre">pre</a></li><li><a href="global.html#siteList">siteList</a></li><li><a href="global.html#siteRoute">siteRoute</a></li><li><a href="global.html#userList">userList</a></li><li><a href="global.html#userRoute">userRoute</a></li><li><a href="global.html#vulnClassList">vulnClassList</a></li><li><a href="global.html#vulnClassRoute">vulnClassRoute</a></li><li><a href="global.html#vulnPolicyApply">vulnPolicyApply</a></li><li><a href="global.html#vulnPolicyCreate">vulnPolicyCreate</a></li><li><a href="global.html#vulnPolicyDelete">vulnPolicyDelete</a></li><li><a href="global.html#vulnPolicyFetch">vulnPolicyFetch</a></li><li><a href="global.html#vulnPolicyList">vulnPolicyList</a></li><li><a href="global.html#vulnPolicyRoute">vulnPolicyRoute</a></li><li><a href="global.html#vulnPolicyUpdate">vulnPolicyUpdate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Fri Feb 27 2015 12:56:56 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 11 2015 10:38:27 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

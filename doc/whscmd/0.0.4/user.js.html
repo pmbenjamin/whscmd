@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: user.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: user.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var _ = require('underscore');
+var httpHelper = require('./httphelper');
+var cliff = require('cliff');
+
+/**
+    Routing function for user commands
+    @param {function} logger - logging function (must support verbose, info, etc.)
+    @param {object} config - config for the HTTP post
+    @param {string} config.host - host to send the request to
+    @param {string} config.port - port to send the request to
+    @param {string} config.apikey - apikey to use for the request
+    @param {string} action - action to route
+    @param {object|string|number} arg1 - variable argument of multiple types depending on the action
+**/
+function userRoute(logger, config, action, arg1) {
+    switch (action) {
+        case "list": 
+            return userList(logger, config, arg1);
+        break;
+        default:
+            logger.error('invalid action => ' + action);
+            return false;
+        break;
+    };
+}
+
+/**
+    List users or a single user
+    @param {function} logger - logging function (must support verbose, info, etc.)
+    @param {object} config - config for the HTTP post
+    @param {string} config.host - host to send the request to
+    @param {string} config.port - port to send the request to
+    @param {string} config.apikey - apikey to use for the request
+    @param {number} [userID] - user to list. If not specified, list all users
+    @param {function} [out] - output processing function. If not specified, dump to console
+**/
+function userList(logger, config, userID, out) {
+    // Optional user ID
+    userID = parseInt(userID);
+    var path = '/api/user';
+    if (!_.isNaN(userID)) {
+        logger.info('User ID => ' + userID);
+        path += '/' + userID;
+    }
+    path += '?format=json';
+
+    // Optional out function
+    var out = out || function defaultOut(status, data) {
+            if (status == 200) {
+                try { 
+                    data = JSON.parse(data);
+                    data = _.isArray(data) ? data : [ data ];
+                } catch (err) {     // Error during parsing of data.
+                    logger.error('parsing return data => ' + err);
+                    return false;
+                };
+                console.log('Listing user%s', data.length == 1 ? '...' : 's...');
+                console.log(cliff.stringifyObjectRows(data, 
+                    ["id", "first_name", "last_name", "username", "company", 
+                        "role", "client_id"], 
+                    ["red", "yellow", "yellow", "yellow", "yellow", "yellow", "blue"]));
+            } else {
+                logger.error("%d => %s", status, data.message);
+            } 
+        };
+
+    var get = new httpHelper.get(logger, config, path, out);
+    return get.execute();
+}
+
+exports.description = 'Manage users. Valid actions include: \
+    \n\tlist - list the specified user or all users.';
+exports.route = userRoute;
+exports.list = userList;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#appList">appList</a></li><li><a href="global.html#appRoute">appRoute</a></li><li><a href="global.html#pre">pre</a></li><li><a href="global.html#siteList">siteList</a></li><li><a href="global.html#siteRoute">siteRoute</a></li><li><a href="global.html#userList">userList</a></li><li><a href="global.html#userRoute">userRoute</a></li><li><a href="global.html#vulnClassList">vulnClassList</a></li><li><a href="global.html#vulnClassRoute">vulnClassRoute</a></li><li><a href="global.html#vulnPolicyApply">vulnPolicyApply</a></li><li><a href="global.html#vulnPolicyCreate">vulnPolicyCreate</a></li><li><a href="global.html#vulnPolicyDelete">vulnPolicyDelete</a></li><li><a href="global.html#vulnPolicyFetch">vulnPolicyFetch</a></li><li><a href="global.html#vulnPolicyList">vulnPolicyList</a></li><li><a href="global.html#vulnPolicyRoute">vulnPolicyRoute</a></li><li><a href="global.html#vulnPolicyUpdate">vulnPolicyUpdate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 11 2015 10:38:27 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
