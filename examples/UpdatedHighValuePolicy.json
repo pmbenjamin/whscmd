@@ -1,0 +1,23 @@
+{
+	"name": "High Value [Updated]",
+	"description": "Policy to use on high value assets. [Updated]",
+	"risk_scores": [
+		{
+			"vuln_class_id": 1,
+			"risk_score": 4,
+			"accepted": 1
+		},
+		{
+			"vuln_class_id": 2,
+			"risk_score": 3
+		},
+		{
+			"vuln_class_id": 5,
+			"risk_score": 2
+		},
+		{
+			"vuln_class_id": 6,
+			"risk_score": 1
+  		}
+ 	]
+} 

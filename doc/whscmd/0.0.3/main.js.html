@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//#!/usr/bin/env node
+
+// whscmd: a utility for interfacing with the WhiteHat Sentinel API
+var program = require('commander');
+var _ = require('underscore');
+var winston = require('winston');
+var logger = new winston.Logger({
+    transports: [
+        new (winston.transports.Console)({
+            colorize: true,
+            prettyPrint: true,
+            showLevel: true
+        })
+    ]
+});
+var cliff = require('cliff');
+var httpHelper = require('./httphelper');
+
+var HOST = 'sentinel.whitehatsec.com';
+var PORT = 443;
+
+/** Preprocessing step for all commands. 
+    @function pre
+    @param {string} name - Name to use when logging.
+    @returns {object} Object contain high level options to avoid passing around the entire program object. 
+**/
+function pre() {
+    logger.transports.console.level = program.verbosity;
+    return {
+        host: program.host,
+        apikey: program.apikey,
+        port: program.port,
+        logger: logger,
+    };
+}
+
+program.version('0.0.1')
+        .option('-v, --verbosity &lt;level>', 'specify output verbosity (verbose|info|warn|error|silent) [error]', 'error')
+        .option('-t, --host &lt;host>', 'specify an alternate host [' + HOST + ']', HOST)
+        .option('-k, --apikey &lt;apikey>', 'specify the WHS API key. THIS IS REQUIRED.')
+        .option('-p, --port &lt;port>', 'specify an alternate port [' + PORT + ']', PORT);
+
+program.command('user &lt;action> [actionOptions]')
+    .description('Manage users. Valid actions include list.')
+    .action(function (action, arg1) {
+        var options = pre('user');
+        switch (action) {
+            case "list": 
+                // Optional user ID
+                var userID = parseInt(arg1);
+                var path = '/api/user';
+                if (!_.isNaN(userID)) {
+                    logger.info('User ID => ' + userID);
+                    path += '/' + userID;
+                }
+                path += '?format=json';
+
+                var get = new httpHelper.get(options, path, 
+                    function (data) {
+                        data = _.isArray(data) ? data : [ data ];
+                        console.log('Listing user%s', data.length == 1 ? '...' : 's...');
+                        console.log(cliff.stringifyObjectRows(data, 
+                            ["id", "first_name", "last_name", "username", "company", 
+                                "role", "client_id"], 
+                            ["red", "yellow", "yellow", "yellow", "yellow", "yellow", "blue"]));
+                    });
+                return get.execute();
+            break;
+            default:
+                logger.error('invalid action => ' + action);
+                return false;
+            break;
+        };
+    });
+
+program.command('site &lt;action> [actionOptions]')
+    .description('Manage sites. Valid actions include list.')
+    .action(function (action, arg1) {
+        var options = pre();        
+        switch (action) {
+            case "list": 
+                // Optional site ID
+                var siteID = parseInt(arg1);
+                var path = '/api/site';
+                if (!_.isNaN(siteID)) {
+                    logger.info('Site ID => ' + siteID);
+                    path += '/' + siteID;
+                }
+                path += '?format=json';
+
+                var get = new httpHelper.get(options, path, 
+                    function (data) {
+                        data = _.isArray(data.sites) ? data.sites : [ data ];
+                        console.log('Listing site%s', data.length == 1 ? '...' : 's...');
+                        console.log(cliff.stringifyObjectRows(data, 
+                            [ "id", "label" ], 
+                            [ "red", "yellow" ]));
+                    });
+                return get.execute();
+            break;
+            default:
+                logger.error('invalid action => ' + action);
+                return false;
+            break;
+        };
+    });
+
+program.command('vuln_class &lt;action> [actionOptions]')
+    .description('Manage vulnerability classes. Valid actions include list.')
+    .action(function (action, arg1) {
+        var options = pre();       
+        switch (action) {
+            case "list": 
+                // Need to supply a valid client ID
+                var clientID = parseInt(arg1);
+                if (_.isNaN(clientID)) {
+                    logger.error('missing required client ID');
+                    logger.error('whscmd vuln_class list &lt;client_id>');
+                    return false;
+                }
+                logger.info('Client ID => ' + clientID);
+                
+                var get = new httpHelper.get(options, '/api/' + clientID + '/vuln_policy/all_vuln_classes?format=json',
+                    function (data) {
+                        console.log('Listing vuln classes...');
+                        console.log(cliff.stringifyObjectRows(data.all_vuln_classes, 
+                            [ "id", "shortname", "name" ], 
+                            [ "red", "yellow", "yellow" ]));
+                    });
+                return get.execute();
+            break;
+            default:
+                logger.error('invalid action => ' + action);
+                return false;
+            break;
+        };
+    });
+
+/** Format and output custom policy information. 
+    @function outputCustomPolicies
+    @param {object} policies 
+    @param {boolean} [suppressID] - Suppress the print out of the ID (good for create). 
+**/
+function outputCustomPolicies(policies, suppressID) {
+    suppressID = _.isUndefined(suppressID) ? false : suppressID;
+    _.each(policies, function (element, index, list) {
+        console.log("Name: %s", element.name);
+        if (!suppressID)
+            console.log("ID: %d", element.id);
+        console.log("Description: %s", element.description);
+        console.log("Risk Scores:");
+        console.log(cliff.stringifyObjectRows(element.risk_scores, 
+            [ "vuln_class_id", "risk_score", "accepted" ], 
+            [ "red", "yellow", "yellow", "yellow" ]));
+
+        console.log(" ");
+    });
+}
+
+/** Format and output custom policy application information. 
+    @function outputCustomApplication
+    @param {object} apply 
+**/
+function outputCustomApplication(apply) {
+    var somethingThere = (apply.sites &amp;&amp; apply.sites.length) || 
+        (apply.applications &amp;&amp; apply.applications.length);
+    if (somethingThere) {
+        if (apply.sites)
+            console.log("Sites: %s", apply.sites);
+        if (apply.applications)
+            console.log("Apps: %s", apply.applications);
+    } else
+        console.log("This policy has not been applied to any sites or applications.")
+}
+
+program.command('vuln_policy &lt;action> [arg1] [arg2]')
+    .description('Manage custom scoring policies. Valid actions include list, create, update, delete.')
+    .action(function (action, arg1, arg2) {
+        var options = pre();
+        switch (action) {
+            case "list": 
+               // Optional vuln policy ID
+                var policyID = parseInt(arg1);
+                var path = '/api/vuln_custom_policy';
+                if (!_.isNaN(policyID)) {
+                    logger.info('Policy ID => ' + policyID);
+                    path += '/' + policyID;
+                }
+                path += '?format=json&amp;display_risk_scores=1';
+
+                var get = new httpHelper.get(options, path, 
+                    function (data) { 
+                        data = _.isArray(data.vuln_custom_policies) ? data.vuln_custom_policies : [ data ];
+                        console.log('Listing polic%s', data.length == 1 ? 'y...' : 'ies...');
+                        outputCustomPolicies(data); 
+                    });
+                return get.execute();
+            break;
+            case "create":
+                // Need to supply a path to the policy file
+                var fname = arg1;
+                if (!_.isString(fname)) {
+                    logger.error('missing required path to JSON file containing custom scoring policy definition.');
+                    logger.error('whscmd vuln_policy create &lt;json_file>');
+                    return false;
+                }
+                logger.info('Policy file => ' + fname);
+
+                // Load up the custom policy definition from the supplied file
+                var fs = require('fs');
+                fs.readFile(fname, 'utf8', function (err, data) {
+                    if (err) {  // Error during reading the file.
+                        logger.error('reading JSON policy file => ' + err);
+                        return false;
+                    }
+
+                    try {   // Try to parse the data from the file into JSON.
+                        data = JSON.parse(data);
+                        console.log("Creating custom policy...");
+                        outputCustomPolicies([ data ], true);
+                    } catch (err) {     // Error during parsing of data.
+                        logger.error('parsing policy file => ' + err);
+                        return false;
+                    };
+                    
+                    // Now perform the post.
+                    var post = new httpHelper.post(options, '/api/vuln_custom_policy');
+                    return post.execute(data);
+                });
+            break;
+            case "update":
+                // Need to supply a valid policyID
+                var policyID = parseInt(arg1);
+                if (!_.isNumber(policyID) || _.isNaN(policyID)) {
+                    logger.error('missing required policy ID');
+                    logger.error('whscmd vuln_policy update &lt;policy_id> &lt;json_file>');
+                    return false;
+                }
+                logger.info('Policy ID => ' + policyID);
+                
+                // Need to supply a path to the policy file
+                var fname = arg2;
+                if (!_.isString(fname)) {
+                    logger.error('missing required path to JSON file containing custom scoring policy definition.');
+                    logger.error('whscmd vuln_policy update &lt;policy_id> &lt;json_file>');
+                    return false;
+                }
+                logger.info('Policy file => ' + fname);
+
+                // Load up the custom policy definition from the supplied file
+                var fs = require('fs');
+                fs.readFile(fname, 'utf8', function (err, data) {
+                    if (err) {  // Error during reading the file.
+                        logger.error('reading JSON policy file => ' + err);
+                        return false;
+                    }
+
+                    try {   // Try to parse the data from the file into JSON.
+                        data = JSON.parse(data);
+                        console.log("Applying custom policy %d...", policyID);
+                        outputCustomPolicies([ data ], true);
+                    } catch (err) {     // Error during parsing of data.
+                        logger.error('parsing policy file => ' + err);
+                        return false;
+                    };
+                    
+                    // Now perform the put.
+                    var put = new httpHelper.put(options, '/api/vuln_custom_policy/' + policyID);
+                    return put.execute(data);
+                });
+            break;
+            case 'delete':
+               // Need to supply a valid policyID
+                var policyID = parseInt(arg1);
+                if (!_.isNumber(policyID) || _.isNaN(policyID)) {
+                    logger.error('missing required policy ID');
+                    logger.error('whscmd vuln_policy delete &lt;policy_id>');
+                    return false;
+                }
+                logger.info('Policy ID => ' + policyID);
+
+                // Now perform the delete.
+                var del = new httpHelper.del(options, '/api/vuln_custom_policy/' + policyID);
+                return del.execute();
+            break;
+            case 'apply':
+               // Need to supply a valid policyID
+                var policyID = parseInt(arg1);
+                if (!_.isNumber(policyID) || _.isNaN(policyID)) {
+                    logger.error('missing required policy ID');
+                    logger.error('whscmd vuln_policy apply &lt;policy_id>');
+                    return false;
+                }
+                logger.info('Policy ID => ' + policyID);
+                
+                // Need to supply a path to the list of sites/applications
+                var fname = arg2;
+                if (!_.isString(fname)) {
+                    logger.error('missing required path to JSON file containing list of sites and applications to apply this policy to.');
+                    logger.error('whscmd vuln_policy apply &lt;policy_id> &lt;json_file>');
+                    return false;
+                }
+                logger.info('Apply file => ' + fname);
+
+                // Load up the custom policy definition from the supplied file
+                var fs = require('fs');
+                fs.readFile(fname, 'utf8', function (err, data) {
+                    if (err) {  // Error during reading the file.
+                        logger.error('reading JSON apply file => ' + err);
+                        return false;
+                    }
+
+                    try {   // Try to parse the data from the file into JSON.
+                        data = JSON.parse(data);
+                        console.log("Applying custom policy...");
+                        outputCustomApplication(data);
+                    } catch (err) {     // Error during parsing of data.
+                        logger.error('parsing policy application file => ' + err);
+                        return false;
+                    };
+                    
+                    // Now perform the put.
+                    var put = new httpHelper.put(options, '/api/vuln_custom_policy/' + policyID + '/assets');
+                    return put.execute(data);
+                });
+            break;
+            case "fetch": 
+               // Need to supply a valid policyID
+                var policyID = parseInt(arg1);
+                if (!_.isNumber(policyID) || _.isNaN(policyID)) {
+                    logger.error('missing required policy ID');
+                    logger.error('whscmd vuln_policy fetch &lt;policy_id>');
+                    return false;
+                }
+                logger.info('Policy ID => ' + policyID);
+ 
+                var get = new httpHelper.get(options, '/api/vuln_custom_policy/' + policyID + '/assets?format=json', 
+                    function (data) { 
+                        outputCustomApplication(data);
+                    });
+                return get.execute();
+            break;
+            case 'detach':
+            break;
+            default:
+                logger.error('invalid action => ' + action);
+                return false;
+            break;
+        };
+    });
+
+program.command('*')
+    .action(function (command) {
+        var options = pre();
+        logger.error("unknown command => " + command);
+    });
+
+program.parse(process.argv);
+
+// Print out help if there are no arguments passed in.
+if (!program.args.length) 
+    program.help();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#outputCustomApplication">outputCustomApplication</a></li><li><a href="global.html#outputCustomPolicies">outputCustomPolicies</a></li><li><a href="global.html#pre">pre</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Fri Feb 27 2015 12:56:56 GMT-0800 (PST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

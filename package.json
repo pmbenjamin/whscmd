@@ -1,0 +1,43 @@
+{
+  "name": "whscmd",
+  "preferGlobal": "true",
+  "version": "0.0.4",
+  "author": "WhiteHat Security Inc <support@whitehatsec.com>",
+  "description": "A utility for interacting with the WhiteHat Sentinel API.",
+  "contributors": [
+    {
+      "name": "Carl Orthlieb",
+      "email": "carl.orthlieb@whitehatsec.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whitehatsec/whscmd.git"
+  },
+  "keywords": [
+    "cli",
+    "whitehat",
+    "API"
+  ],
+  "bin": {
+    "whscmd": "./bin/whscmd.js"
+  },
+  "main": "main.js",
+  "dependencies": {
+    "cliff": "^0.1.10",
+    "commander": "*",
+    "mocha": "^2.1.0",
+    "should": "^5.1.0",
+    "underscore": "*",
+    "winston": "*"
+  },
+  "noAnalyze": false,
+  "bundleDependencies": [],
+  "license": "Apache Public License v2",
+  "engine": {
+    "node": ">=0.10.0"
+  },
+  "devDependencies": {
+    "should": "^5.1.0"
+  }
+}

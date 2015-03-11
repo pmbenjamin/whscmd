@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: httphelper.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: httphelper.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var https = require('https');
+var _ = require('underscore');
+
+/**
+    Generic HTTPGet class.
+    @constructor
+    @param {object} options - Options for the HTTP post.
+    @param {string} options.host - host to send the request to
+    @param {string} options.port - port to send the request to
+    @param {string} options.apikey - apikey to use for the request
+    @param {function} options.logger - logger function to log output to
+    @param {string} path - URL to perform the GET on.
+    @param {function} formatOutput - function to process JSON output
+**/
+function HTTPGet(options, path, formatOutput) {
+    var logger = options.logger;
+
+    /** @property {string} Name of the command invoking the GET. */
+    this.options = {
+        host: options.host,
+        rejectUnauthorized: false,
+        port: options.port,
+        method: 'GET',
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey
+    };
+    this.logger = options.logger;
+    /** @method HTTPGet.formatOutput - Output formatter to process data and output accordingly
+        @param {object} data - data, in JSON format, from the GET. **/
+    this.formatOutput = formatOutput || function(data) {
+        console.log('Listing ' + this.name);
+        console.log(JSON.stringify(data));
+    };
+    /** Execute the get
+        @method HTTPGet.execute
+        @returns {boolean} true on success, false on error **/
+    this.execute = function () {
+        var that = this;
+        if (!options.apikey) {
+            logger.error('must supply an API key option (-k)'); 
+            return false;
+        }
+        var responseData = '';
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
+        var clientReq = https.request(that.options, function (clientRes) {
+            logger.info('StatusCode => ' + clientRes.statusCode);
+            logger.info('Headers => ' + JSON.stringify(clientRes.headers));
+
+            // Restore the chunks of data to a single string.
+            clientRes.on('data', function (chunk) {
+                responseData += chunk;
+            });
+
+            // Process the end event.
+            clientRes.on('end', function () {
+                logger.info('end received');
+                if (!responseData) {
+                    logger.error('no data returned');
+                } else { 
+                    logger.verbose('raw data => ', responseData)
+                    responseData = JSON.parse(responseData);
+
+                    if (responseData.status) {
+                        logger.error(responseData.message);
+                    } else {
+                        that.formatOutput(responseData);
+                    }
+                }
+            });
+        }).on('error', function (e) {
+            logger.error('problem with https request => ' + e.message);
+            return false;
+        });
+        clientReq.end();
+        return true;
+    }
+}
+
+/**
+    Generic HTTPPost class.
+    @constructor
+    @param {object} options - Options for the HTTP post
+    @param {string} options.host - host to send the request to
+    @param {string} options.port - port to send the request to
+    @param {string} options.apikey - apikey to use for the request
+    @param {function} options.logger - logger function to log output to
+    @param {string} path - URL to perform the POST on
+**/
+function HTTPPost(options, path) {
+    var logger = options.logger;
+
+    /** @property {object} options - options associated with the POST */
+    this.options = {
+        host: options.host,
+        rejectUnauthorized: false,
+        port: options.port,
+        method: 'POST',
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey,
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': 0,
+            'Accept': 'application/json'
+        }
+    };
+        
+    /** Execute the post
+        @method HTTPPost.execute
+        @param {object} postData - data to post in JSON format
+        @returns {boolean} true on success, false on error **/
+    this.execute = function (postData) {
+        postData = JSON.stringify(postData);
+        var that = this;
+        if (!options.apikey) {
+            logger.error('must supply an API key option (-k)'); 
+            return false;
+        }
+
+        that.options.headers["Content-Length"] = postData.length;
+
+        var responseData = '';
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
+        var clientReq = https.request(that.options, function (clientRes) {
+            logger.info('Status Code => ' + clientRes.statusCode);
+            logger.info('Headers => ' + JSON.stringify(clientRes.headers));
+
+            // Restore the chunks of data to a single string.
+            clientRes.on('data', function (chunk) {
+                responseData += chunk;
+            });
+
+            // Process the end event.
+            clientRes.on('end', function () {
+                logger.info('end received');
+                try {
+                    responseData = JSON.parse(responseData);
+                    if (responseData.message) {
+                        logger.error(responseData.message);
+                        return false;
+                    } else { 
+                        console.log('Response => ', responseData)
+                    }
+                } catch (e) {
+                    logger.error('problem with parsing response => ' + e.message);
+                    return false;                    
+                }
+            });
+        }).on('error', function (e) {
+            logger.error('problem with https request => ' + e.message);
+            return false;
+        });
+
+        logger.verbose('Outbound POST Data => ' + postData);
+        clientReq.write(postData);
+        clientReq.end();
+        return true;
+    }
+}
+
+/**
+    Generic HTTPPut class.
+    @constructor
+    @param {object} options - Options for the HTTP post
+    @param {string} options.host - host to send the request to
+    @param {string} options.port - port to send the request to
+    @param {string} options.apikey - apikey to use for the request
+    @param {function} options.logger - logger function to log output to
+    @param {string} path - URL to perform the POST on
+**/
+function HTTPPut(options, path) {
+    var logger = options.logger;
+
+    /** @property {object} options - options associated with the POST */
+    this.options = {
+        host: options.host,
+        rejectUnauthorized: false,
+        port: options.port,
+        method: 'PUT',
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey,
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': 0,
+            'Accept': 'application/json'
+        }
+    };
+        
+    /** Execute the post
+        @method HTTPPost.execute
+        @param {object} putData - data to post in JSON format
+        @returns {boolean} true on success, false on error **/
+    this.execute = function (putData) {
+        putData = JSON.stringify(putData);
+        var that = this;
+        if (!options.apikey) {
+            logger.error('must supply an API key option (-k)'); 
+            return false;
+        }
+
+        that.options.headers["Content-Length"] = putData.length;
+
+        var responseData = '';
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
+        var clientReq = https.request(that.options, function (clientRes) {
+            logger.info('Status Code => ' + clientRes.statusCode);
+            logger.info('Headers => ' + JSON.stringify(clientRes.headers));
+
+            // Restore the chunks of data to a single string.
+            clientRes.on('data', function (chunk) {
+                responseData += chunk;
+            });
+
+            // Process the end event.
+            clientRes.on('end', function () {
+                logger.info('end received');
+                try {
+                    responseData = JSON.parse(responseData);
+                    if (responseData.message) {
+                        logger.error(responseData.message);
+                        return false;
+                    } else { 
+                        console.log('Response => ', responseData)
+                    }
+                } catch (e) {
+                    logger.error('problem with parsing response => ' + e.message);
+                    return false;                    
+                }
+            });
+        }).on('error', function (e) {
+            logger.error('problem with https request => ' + e.message);
+            return false;
+        });
+
+        logger.verbose('Outbound PUT Data => ' + putData);
+        clientReq.write(putData);
+        clientReq.end();
+        return true;
+    }
+}
+
+/**
+    Generic HTTPDelete class.
+    @constructor
+    @param {object} options - Options for the HTTP post
+    @param {string} options.host - host to send the request to
+    @param {string} options.port - port to send the request to
+    @param {string} options.apikey - apikey to use for the request
+    @param {function} options.logger - logger function to log output to
+    @param {string} path - URL to perform the POST on
+**/
+function HTTPDelete(options, path) {
+    var logger = options.logger;
+
+    /** @property {object} options - options associated with the POST */
+    this.options = {
+        host: options.host,
+        rejectUnauthorized: false,
+        port: options.port,
+        method: 'DELETE',
+        path: '/' + path + (path.indexOf('?') == -1 ? '?' : '&amp;') + 'key=' + options.apikey,
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': 0,
+            'Accept': 'application/json'
+        }
+    };
+        
+    /** Execute the post
+        @method HTTPDelete.execute
+        @returns {boolean} true on success, false on error **/
+    this.execute = function () {
+        var that = this;
+        if (!options.apikey) {
+            logger.error('must supply an API key option (-k)'); 
+            return false;
+        }
+        var responseData = '';
+        logger.verbose('Outbound Headers => ' + JSON.stringify(that.options));
+        var clientReq = https.request(that.options, function (clientRes) {
+            logger.info('Status Code => ' + clientRes.statusCode);
+            logger.info('Headers => ' + JSON.stringify(clientRes.headers));
+
+            // Restore the chunks of data to a single string.
+            clientRes.on('data', function (chunk) {
+                responseData += chunk;
+            });
+
+            // Process the end event.
+            clientRes.on('end', function () {
+                logger.info('end received');
+                try {
+                    responseData = JSON.parse(responseData);
+                    console.log(responseData.message);
+                } catch (e) {
+                    logger.error('problem with parsing response => ' + e.message);
+                    return false;                    
+                }
+            });
+        }).on('error', function (e) {
+            logger.error('problem with https request => ' + e.message);
+            return false;
+        });
+
+        clientReq.end();
+        return true;
+    }
+}
+
+exports.get = HTTPGet;
+exports.post = HTTPPost;
+exports.put = HTTPPut;
+exports.del = HTTPDelete;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="HTTPDelete.html">HTTPDelete</a></li><li><a href="HTTPGet.html">HTTPGet</a></li><li><a href="HTTPPost.html">HTTPPost</a></li><li><a href="HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#outputCustomApplication">outputCustomApplication</a></li><li><a href="global.html#outputCustomPolicies">outputCustomPolicies</a></li><li><a href="global.html#pre">pre</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Fri Feb 27 2015 12:56:56 GMT-0800 (PST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
