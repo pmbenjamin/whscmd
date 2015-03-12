@@ -156,5 +156,5 @@ Legal
 ------
 
 `whscmd` is developed by WhiteHat Security and is copyright (c) 2015 by WhiteHat Security Inc. All Rights Reserved.
-whscmd is made available under the Apache Public License, version 2.  See the [LICENSE](http://www.apache.org/licenses/LICENSE-2.0) file for more information.
+whscmd is made available under the Apache Public License, version 2.  See the [LICENSE](LICENCE) file for more information.
 
