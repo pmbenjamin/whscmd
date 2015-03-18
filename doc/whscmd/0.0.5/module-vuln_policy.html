@@ -61,7 +61,312 @@
 
     
 
-    <h4 class="name" id="~vulnPolicyApply"><span class="type-signature">(inner) </span>vulnPolicyApply<span class="signature">(logger, config, policyID, jsonFile, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~outputCustomApplication"><span class="type-signature">(protected, inner) </span>outputCustomApplication<span class="signature">(apply)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Format and output custom policy application information.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>apply</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line30">line 30</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~outputCustomPolicies"><span class="type-signature">(protected, inner) </span>outputCustomPolicies<span class="signature">(policies, suppressID<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Format and output custom policy information.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>policies</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>suppressID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Suppress the print out of the ID (good for create).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line8">line 8</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~vulnPolicyApply"><span class="type-signature">(inner) </span>vulnPolicyApply<span class="signature">(logger, config, policyID, set, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -292,13 +597,13 @@
 
         <tr>
             
-                <td class="name"><code>jsonFile</code></td>
+                <td class="name"><code>set</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -316,7 +621,7 @@
 
             
 
-            <td class="description last">local json file containing the list of apps/sites</td>
+            <td class="description last">json object containing the list of apps/sites</td>
         </tr>
 
     
@@ -390,7 +695,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line257">line 257</a>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line291">line 291</a>
     </li></ul></dd>
     
 
@@ -421,7 +726,7 @@
 
     
 
-    <h4 class="name" id="~vulnPolicyCreate"><span class="type-signature">(inner) </span>vulnPolicyCreate<span class="signature">(logger, config, jsonFile, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~vulnPolicyCreate"><span class="type-signature">(inner) </span>vulnPolicyCreate<span class="signature">(logger, config, policy, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -621,13 +926,13 @@
 
         <tr>
             
-                <td class="name"><code>jsonFile</code></td>
+                <td class="name"><code>policy</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -645,7 +950,7 @@
 
             
 
-            <td class="description last">local json file containing the policy definition.</td>
+            <td class="description last">json object containing the policy definition</td>
         </tr>
 
     
@@ -719,7 +1024,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line135">line 135</a>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line199">line 199</a>
     </li></ul></dd>
     
 
@@ -1048,7 +1353,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line231">line 231</a>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line265">line 265</a>
     </li></ul></dd>
     
 
@@ -1377,7 +1682,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line309">line 309</a>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line328">line 328</a>
     </li></ul></dd>
     
 
@@ -1708,7 +2013,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line95">line 95</a>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line159">line 159</a>
     </li></ul></dd>
     
 
@@ -2043,7 +2348,7 @@
 
     
 
-    <h4 class="name" id="~vulnPolicyUpdate"><span class="type-signature">(inner) </span>vulnPolicyUpdate<span class="signature">(logger, config, policyID, jsonFile, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~vulnPolicyUpdate"><span class="type-signature">(inner) </span>vulnPolicyUpdate<span class="signature">(logger, config, policyID, policy, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -2274,7 +2579,7 @@
 
         <tr>
             
-                <td class="name"><code>jsonFile</code></td>
+                <td class="name"><code>policy</code></td>
             
 
             <td class="type">
@@ -2298,7 +2603,7 @@
 
             
 
-            <td class="description last">local json file containing the policy definition</td>
+            <td class="description last">json object containing the policy definition</td>
         </tr>
 
     
@@ -2372,7 +2677,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line179">line 179</a>
+        <a href="vuln_policy.js.html">vuln_policy.js</a>, <a href="vuln_policy.js.html#line228">line 228</a>
     </li></ul></dd>
     
 
@@ -2420,7 +2725,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Thu Mar 12 2015 09:55:56 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 18 2015 11:29:44 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -8,10 +8,8 @@
     	"port": "443"
     },
     "user": {
-    	"id" : "a valid user id"
-    },
-    "app": {
-    	"id": "a valid app id"
+        "createFile": "path to a user definition you want to create",
+        "updateFile": "path to a user definition you want to update to"
     },
     "vuln_class": {
         "id": "a valid vuln class id"
@@ -21,8 +19,5 @@
         "updateFile": "path to a policy update",
         "applyFile": "path to a list of sites/apps you want to apply the policy to",
         "detachFile": "examples/DetachPolicy.json"
-    },
-    "site": {
-        "id": "a valid site id"
     }
 }

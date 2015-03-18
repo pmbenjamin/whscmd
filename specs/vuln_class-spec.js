@@ -19,6 +19,8 @@ describe("Vuln Classes", function () {
 	describe("#list", function () {
 		this.timeout(10000);
 		it("should list some classes", function (done) {
+			console.log("whscmd vuln_class list", config.vuln_class.id, "-k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			var list = vuln_class.list(logger, config.header, config.vuln_class.id, function (status, data) {
 				status.should.equal(200);
 				(function () { data = JSON.parse(data); }).should.not.throw(Error);

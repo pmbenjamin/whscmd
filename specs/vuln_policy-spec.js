@@ -34,29 +34,17 @@ function loadJSON(fileName, done) {
 }
 
 var vulnPolicyID;
-var createData;
 
 describe("Vuln Policies", function () {
 
-	describe("#list", function () {
-		it("should list some policies", function (done) {
-			vuln_policy.list(logger, config.header, undefined, function (status, data) {
-				status.should.equal(200);
-				(function () { data = JSON.parse(data); }).should.not.throw(Error);
-				data.should.have.property("vuln_custom_policies");	
-				data.vuln_custom_policies.length.should.be.greaterThan(0);	
-	       		data.vuln_custom_policies[0].should.have.property("risk_scores");	
-	       		done();
-			});
-		});
-	});  
-
-	// Should load up the files and make this independent of the values.
 	describe("#create", function () {
+		console.log("whscmd vuln_policy create", config.vuln_policy.createFile, "-k", config.header.apikey,
+			"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 		this.timeout(30000);
 		it("should create a policy", function (done) {
 			loadJSON(config.vuln_policy.createFile, function (createData) {
-				vuln_policy.create(logger, config.header, config.vuln_policy.createFile, function (status, data) {
+				createData.name += " " + new Date();	// Need a unique name!
+				vuln_policy.create(logger, config.header, createData, function (status, data) {
 					status.should.equal(201);
 					(function () { data = JSON.parse(data); }).should.not.throw(Error);
 					vulnPolicyID = data.id;			
@@ -69,13 +57,31 @@ describe("Vuln Policies", function () {
 		});
 	});
 
+	describe("#list", function () {
+		it("should list some policies", function (done) {
+			console.log("whscmd vuln_policy list -k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
+			vuln_policy.list(logger, config.header, undefined, function (status, data) {
+				status.should.equal(200);
+				(function () { data = JSON.parse(data); }).should.not.throw(Error);
+				data.should.have.property("vuln_custom_policies");	
+				data.vuln_custom_policies.length.should.be.greaterThan(0);	
+	       		data.vuln_custom_policies[0].should.have.property("risk_scores");	
+	       		done();
+			});
+		});
+	});  
+
 	describe("#list <policyID>", function () {
 		it("should get a policy", function (done) {
 			loadJSON(config.vuln_policy.createFile, function (createData) {
+				console.log("whscmd vuln_policy list", vulnPolicyID, "-k", config.header.apikey,
+					"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 				vuln_policy.list(logger, config.header, vulnPolicyID, function (status, data) {
 					console.log("\tPolicyID: ", vulnPolicyID);
 					status.should.equal(200);
 					(function () { data = JSON.parse(data); }).should.not.throw(Error);
+					createData.name = data.name;
 					data = _.pick(data, _.keys(createData));
 					assert.deepEqual(data, createData);
 					done();
@@ -86,8 +92,10 @@ describe("Vuln Policies", function () {
 
 	describe("#update <policyID> <jsonFile>", function () {
 		it("should update a policy", function (done) {
+			console.log("whscmd vuln_policy update", config.vuln_policy.updateFile, "-k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			loadJSON(config.vuln_policy.updateFile, function (updateData) {
-				vuln_policy.update(logger, config.header, vulnPolicyID, config.vuln_policy.updateFile, function (status, data) {
+				vuln_policy.update(logger, config.header, vulnPolicyID, updateData, function (status, data) {
 					console.log("\tPolicyID: ", vulnPolicyID);
 					status.should.equal(200);
 					(function () { data = JSON.parse(data); }).should.not.throw(Error);
@@ -99,12 +107,12 @@ describe("Vuln Policies", function () {
 		});
 	});
 
-	//
-
 	describe("#apply <policyID> <jsonFile>", function () {
 		it("should apply a policy to a set of sites", function (done) {
+			console.log("whscmd vuln_policy apply", config.vuln_policy.applyFile, "-k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			loadJSON(config.vuln_policy.applyFile, function (applyData) {
-				vuln_policy.apply(logger, config.header, vulnPolicyID, config.vuln_policy.applyFile, function (status, data) {
+				vuln_policy.apply(logger, config.header, vulnPolicyID, applyData, function (status, data) {
 					console.log("\tPolicyID: ", vulnPolicyID);
 					status.should.equal(200);
 					(function () { data = JSON.parse(data); }).should.not.throw(Error);
@@ -118,21 +126,23 @@ describe("Vuln Policies", function () {
 
 	describe("#fetch <policyID>", function () {
 		it("should fetch which sites have a policy applied", function (done) {
-			loadJSON(config.vuln_policy.applyFile, function (applyData) {
-				vuln_policy.fetch(logger, config.header, vulnPolicyID, function (status, data) {
-					console.log("\tPolicyID: ", vulnPolicyID);
-					status.should.equal(200);
-					(function () { data = JSON.parse(data); }).should.not.throw(Error);
-					data = _.pick(data, _.keys(applyData));
-					assert.deepEqual(data, applyData);
-					done();
-				});
+			console.log("whscmd vuln_policy fetch -k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
+			vuln_policy.fetch(logger, config.header, vulnPolicyID, function (status, data) {
+				console.log("\tPolicyID: ", vulnPolicyID);
+				status.should.equal(200);
+				(function () { data = JSON.parse(data); }).should.not.throw(Error);
+				data = _.pick(data, _.keys(data));
+				assert.deepEqual(data, data);
+				done();
 			});
 		});
 	});
 
 	describe("#delete", function () {
 		it("should not delete a policy if it has been applied to sites", function (done) {
+			console.log("whscmd vuln_policy delete -k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			vuln_policy.delete(logger, config.header, vulnPolicyID, function (status, data) {
 				console.log("\tPolicyID: ", vulnPolicyID);
 				status.should.equal(405);	
@@ -144,8 +154,10 @@ describe("Vuln Policies", function () {
 
 	describe("#apply <policyID> <jsonFile>", function () {
 		it("should detach a policy from all sites", function (done) {
+			console.log("whscmd vuln_policy apply", config.vuln_policy.detachFile, "-k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			loadJSON(config.vuln_policy.detachFile, function (detachData) {
-				vuln_policy.apply(logger, config.header, vulnPolicyID, config.vuln_policy.detachFile, function (status, data) {
+				vuln_policy.apply(logger, config.header, vulnPolicyID, detachData, function (status, data) {
 					console.log("\tPolicyID: ", vulnPolicyID);
 					status.should.equal(200);
 					(function () { data = JSON.parse(data); }).should.not.throw(Error);
@@ -159,6 +171,8 @@ describe("Vuln Policies", function () {
 
 	describe("#delete", function () {
 		it("should delete a policy", function (done) {
+			console.log("whscmd vuln_policy delete -k", config.header.apikey,
+				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			vuln_policy.delete(logger, config.header, vulnPolicyID, function (status, data) {
 				console.log("\tPolicyID: ", vulnPolicyID);
 				status.should.equal(200);	

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3>whscmd 0.0.5</h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><p><img src="images/WhiteHatLogoColor.png" alt="WhiteHat"></p>
+<h1>WHS Command</h1><p><code>whscmd</code> is a node-based command line utility by <a href="http://www.whitehatsec.com">WhiteHat Security</a> for interacting with the WhiteHat API.</p>
+<h2>Current Status</h2><p>[<strong>ALPHA</strong>] v0.0.5</p>
+<h3>Release Notes</h3><p>See the <a href="https://git.dev.whs/carlorthlieb/whscmd/commits/master]">git repo</a>.</p>
+<h2>Installation</h2><p>You will first need to install <a href="https://nodejs.org/">node</a>.</p>
+<p><code>whscmd</code> is available as a node.js NPM module can be installed by as follows:</p>
+<pre class="prettyprint source"><code>[sudo] npm install -g whscmd</code></pre><h2>Local Installation</h2><p>To install your own local copy (with executable), clone this repository, navigate to the top level directory, and install via:</p>
+<pre class="prettyprint source"><code>npm install -g .    </code></pre><h2>Running whscmd from the command line</h2><p>You can run the whscmd utility from the command line as long as node is installed.</p>
+<pre class="prettyprint source"><code>Usage: whscmd [options] &lt;command> &lt;action> [params]</code></pre><h3>Options</h3><p>Options are invoked either with a dash and the flag letter or with a double dash and the long name for the option. Note that some options require additional information as specified below.</p>
+<p><code>whscmd -&lt;flag&gt; [param]</code> or <code>whscmd --&lt;name&gt; [param]</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Flag</th>
+<th style="text-align:left">Name</th>
+<th style="text-align:left">Param</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">h</td>
+<td style="text-align:left">help</td>
+<td style="text-align:left"><em>none</em></td>
+<td style="text-align:left">Output usage information.</td>
+</tr>
+<tr>
+<td style="text-align:left">V</td>
+<td style="text-align:left">version</td>
+<td style="text-align:left"><em>none</em></td>
+<td style="text-align:left">Output the version number of the command. </td>
+</tr>
+<tr>
+<td style="text-align:left">v</td>
+<td style="text-align:left">verbosity</td>
+<td style="text-align:left">verbose, info, warn, error, silent</td>
+<td style="text-align:left">Verbosity of output. Default is <strong>error</strong>.</td>
+</tr>
+<tr>
+<td style="text-align:left">t</td>
+<td style="text-align:left">host</td>
+<td style="text-align:left">url</td>
+<td style="text-align:left">Specify an alternate host for the command to run against. Default is <https://sentinel.whitehatsec.com>.</td>
+</tr>
+<tr>
+<td style="text-align:left">k</td>
+<td style="text-align:left">apikey</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">NOT OPTIONAL. This is required for all commands. Note that you must set up the API key in Sentinel to allow access by this utility.</td>
+</tr>
+<tr>
+<td style="text-align:left">p</td>
+<td style="text-align:left">port</td>
+<td style="text-align:left">number</td>
+<td style="text-align:left">Alternate port. Default is <strong>443</strong>.</td>
+</tr>
+</tbody>
+</table>
+<h3>Commands</h3><h4>App</h4><h5>app list [appID]</h5><p>Lists all current applications or a single application if <em>appID</em> is specified. Returns app ID, label, and status for each site.</p>
+<h4>Site</h4><h5>site list [siteID]</h5><p>Lists all current sites or a single site if <em>siteID</em> is specified. Returns site ID, label, and scan status for each site.</p>
+<h4>User</h4><h5>user create \<jsonFile\></h5><p>Creates a new user based on the user definition in the supplied file path <em>jsonFile</em>. The JSON file needs to have the following format:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Entry</th>
+<th style="text-align:left">Type</th>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">username</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">User name in the form of an email address. Must be unique.</td>
+</tr>
+<tr>
+<td style="text-align:left">client_id</td>
+<td style="text-align:left">integer</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Client id that this user should be assigned to.</td>
+</tr>
+<tr>
+<td style="text-align:left">role</td>
+<td style="text-align:left">( Admin \</td>
+<td style="text-align:left">Dev \</td>
+<td style="text-align:left">Secops \</td>
+<td>Secops Admin \</td>
+<td>Viewer )</td>
+<td>-</td>
+<td>Type of user</td>
+</tr>
+<tr>
+<td style="text-align:left">type</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Must be &quot;sentinel&quot;</td>
+</tr>
+<tr>
+<td style="text-align:left">first_name</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">First name</td>
+</tr>
+<tr>
+<td style="text-align:left">last_name</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Last name</td>
+</tr>
+<tr>
+<td style="text-align:left">job_title</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Job title</td>
+</tr>
+<tr>
+<td style="text-align:left">address</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Address</td>
+</tr>
+<tr>
+<td style="text-align:left">city</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">City</td>
+</tr>
+<tr>
+<td style="text-align:left">state</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">State/province/region</td>
+</tr>
+<tr>
+<td style="text-align:left">zipcode</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Zip or postal code</td>
+</tr>
+<tr>
+<td style="text-align:left">country</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Country</td>
+</tr>
+<tr>
+<td style="text-align:left">timezone</td>
+<td style="text-align:left">( America/New_York \</td>
+<td style="text-align:left">America/Chicago \</td>
+<td style="text-align:left">America/Denver \</td>
+<td>America/Los_Angeles \</td>
+<td>America/Anchorage \</td>
+<td>America/Lima \</td>
+<td>America/Santiago \</td>
+<td>America/Sao_Paulo \</td>
+<td>America/St_Johns \</td>
+<td>America/Tegucigalpa \</td>
+<td>America/Toronto \</td>
+<td>Africa/Cairo \</td>
+<td>Africa/Johannesburg \</td>
+<td>Asia/Bangkok \</td>
+<td>Asia/Calcutta \</td>
+<td>Asia/Colombo \</td>
+<td>Asia/Dubai \</td>
+<td>Asia/Hong_Kong \</td>
+<td>Asia/Jerusalem \</td>
+<td>Asia/Kamchatka \</td>
+<td>Asia/Karachi \</td>
+<td>Asia/Singapore \</td>
+<td>Asia/Tokyo \</td>
+<td>Asia/Vladivostok \</td>
+<td>Australia/Adelaide \</td>
+<td>Australia/Sydney \</td>
+<td>Europe/Amsterdam \</td>
+<td>Europe/Athens \</td>
+<td>Europe/London \</td>
+<td>Europe/Moscow \</td>
+<td>Pacific/Auckland \</td>
+<td>Pacific/Honolulu )</td>
+<td>optional</td>
+<td>Time zone</td>
+</tr>
+<tr>
+<td style="text-align:left">phone</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Phone number</td>
+</tr>
+<tr>
+<td style="text-align:left">mobile</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Mobile number</td>
+</tr>
+<tr>
+<td style="text-align:left">fax</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Fax number</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre class="prettyprint source"><code>{
+    &quot;username&quot;: &quot;foo@bar.com&quot;,
+    &quot;client_id&quot;: &quot;1&quot;,
+    &quot;first_name&quot;: &quot;Elon&quot;,
+    &quot;last_name&quot;: &quot;Bar&quot;,
+    &quot;type&quot;: &quot;sentinel&quot;,
+    &quot;role&quot;: &quot;Viewer&quot;,
+    &quot;address&quot;: &quot;1011 Maserati Drive&quot;,
+    &quot;city&quot;: &quot;Teslaville&quot;,
+    &quot;state&quot;: &quot;CA&quot;,
+    &quot;zipcode&quot;: &quot;95054&quot;,
+    &quot;country&quot;: &quot;USA&quot;,
+    &quot;phone&quot;: &quot;+1 408 555 1212&quot;,
+    &quot;fax&quot;: &quot;+1 408 555 1111&quot;
+}  </code></pre><h5>user delete \<userID\></h5><p>Deletes an existing user as specified by <em>userID</em>.</p>
+<h5>user list [userID]</h5><p>Lists all current users or a single user if <em>userID</em> is specified. Returns name, user name, company, role, and client ID for each user.</p>
+<h5>user update \<userID\> \<jsonFile\></h5><p>Updates an existing user specified by <em>userID</em> with the user definition in the supplied file path <em>jsonFile</em>. The JSON file needs to have a format identical to that of the <em>create</em> action.</p>
+<h4>Vuln Class</h4><h5>vuln_class list \<clientID\></h5><p>Lists all vulnerability classes for the specified <em>clientID</em>. Returns vuln class ID, short name, and full name for the vuln classs.</p>
+<h4>Vuln Policy</h4><h5>vuln_policy apply \<policyID\> <jsonFile></h5><p>Applies the policy specified by <em>policyID</em> to the list of sites and applications listed in the supplied file <em>jsonFile</em>. The JSON file needs to have the following format:</p>
+<pre class="prettyprint source"><code>{
+    &quot;sites&quot;: [ &lt;site_id>, ... ],
+    &quot;applications&quot;: [ &lt;app_id>, ... ]
+}    </code></pre><h5>vuln_policy create \<jsonFile\></h5><p>Creates a new policy based on the policy in the supplied file path <em>jsonFile</em>. The json file needs to have the following format: </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Entry</th>
+<th style="text-align:left">Type</th>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">name</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Name of the policy. Must be unique.</td>
+</tr>
+<tr>
+<td style="text-align:left">description</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">optional</td>
+<td style="text-align:left">Description of the policy.</td>
+</tr>
+<tr>
+<td style="text-align:left">risk_scores</td>
+<td style="text-align:left">array</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Array of risk score entries.</td>
+</tr>
+</tbody>
+</table>
+<p>Each risk score entry consists of the following fields:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Entry</th>
+<th style="text-align:left">Possible Value</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">vuln_class_id</td>
+<td style="text-align:left">integer</td>
+<td style="text-align:left">A valid ID as returned by the <code>vuln_class list</code> command.</td>
+</tr>
+<tr>
+<td style="text-align:left">risk_score</td>
+<td style="text-align:left">integer</td>
+<td style="text-align:left">A number from 1 (least severe) to 5 (most severe). When the policy is applied to an asset, this risk score will override the existing default for the vuln class.</td>
+</tr>
+<tr>
+<td style="text-align:left">[accepted]</td>
+<td style="text-align:left">0 or 1</td>
+<td style="text-align:left">Optional. Determines whether the vuln class is accepted and will be suppressed from the UI and most reports. Default is 0.</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre class="prettyprint source"><code>{
+    &quot;name&quot;: &quot;High Value&quot;,
+    &quot;description&quot;: &quot;Policy to use on high value assets.&quot;,
+    &quot;risk_scores&quot;: [
+        {
+            &quot;vuln_class_id&quot;: 1,
+            &quot;risk_score&quot;: 5
+        },
+        {
+            &quot;vuln_class_id&quot;: 2,
+            &quot;risk_score&quot;: 4
+        },
+        {
+            &quot;vuln_class_id&quot;: 5,
+            &quot;risk_score&quot;: 3
+        },
+        {
+            &quot;vuln_class_id&quot;: 6,
+            &quot;risk_score&quot;: 2
+          }
+     ]
+}    </code></pre><h5>vuln_policy delete \<policyID\></h5><p>Deletes an existing policy specified by <em>policyID</em>.</p>
+<h5>vuln_policy fetch \<policyID\></h5><p>Return the list of sites and apps that the policy specified by <em>policyID</em> has been attached to.</p>
+<h5>vuln_policy update \<policyID\> \<jsonFile\></h5><p>Updates an existing policy specified by <em>policyID</em> and the policy in the supplied file path <em>jsonFile</em>. The JSON file needs to have a format identical to that of the <em>create</em> action.</p>
+<h5>vuln_policy list [policyID]</h5><p>Lists all custom vulnerability policies or a single policy if <em>policyID</em> is specified. Returns name, policyID, description, risk scores (vuln class ID/risk score list) for each policy.</p>
+<h2>Generating Documentation</h2><p><strong>whscmd</strong> uses <a href="http://usejsdoc.org">JSDoc</a> to generate documentation from this README.md and comments in the code. You can install jsdoc via npm:</p>
+<pre class="prettyprint source"><code>npm install jsdoc -g</code></pre><p>To generate documentation, on the command line in the top level directory for the project invoke</p>
+<pre class="prettyprint source"><code>jsdoc lib -r --readme ./README.md -d doc -P ./package.json</code></pre><p>Resulting documentation suitable for publishing can be found in the <em>doc</em> folder.</p>
+<h2>Running Tests</h2><p><strong>whscmd</strong> uses the <a href="http://mochajs.org/">mocha</a> test suite to ensure that the command line is working correctly. You can install mocha via npm:</p>
+<pre class="prettyprint source"><code>npm install mocha -g</code></pre><p>Tests can be found in the <code>specs</code> directory. You will need to modify <code>config.template.json</code>, supply an API key and valid IDs, and save it as <code>config.json</code> in the <code>specs</code> directory. Once that is complete, you can run the tests by invoking:</p>
+<pre class="prettyprint source"><code>mocha specs/</code></pre><h2>Credits</h2><p>Main whscommander: Carl Orthlieb, API by Terence Montiero</p>
+<p>Many thanks to the node community, the commander.js folks, and suggestions from the rest of the WhiteHat Security team.</p>
+<h2>Legal</h2><p><code>whscmd</code> is developed by WhiteHat Security and is copyright (c) 2015 by WhiteHat Security Inc. All Rights Reserved.
+whscmd is made available under the Apache Public License, version 2.  See the <a href="LICENCE">LICENSE</a> file for more information.</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-HTTPHelper.html">HTTPHelper</a></li><li><a href="module-site.html">site</a></li><li><a href="module-user.html">user</a></li><li><a href="module-vuln_class.html">vuln_class</a></li><li><a href="module-vuln_policy.html">vuln_policy</a></li></ul><h3>Classes</h3><ul><li><a href="module-HTTPHelper-HTTPDelete.html">HTTPDelete</a></li><li><a href="module-HTTPHelper-HTTPGet.html">HTTPGet</a></li><li><a href="module-HTTPHelper-HTTPPost.html">HTTPPost</a></li><li><a href="module-HTTPHelper-HTTPPut.html">HTTPPut</a></li></ul><h3>Global</h3><ul><li><a href="global.html#pre">pre</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 18 2015 11:29:44 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

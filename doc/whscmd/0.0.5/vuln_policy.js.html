@@ -35,7 +35,7 @@ var cliff = require('cliff');
 
 /** Format and output custom policy information. 
     @function outputCustomPolicies
-    @private
+    @protected
     @param {object} policies 
     @param {boolean} [suppressID] - Suppress the print out of the ID (good for create). 
 **/
@@ -57,7 +57,7 @@ function outputCustomPolicies(policies, suppressID) {
 
 /** Format and output custom policy application information. 
     @function outputCustomApplication
-    @private
+    @protected
     @param {object} apply 
 **/
 function outputCustomApplication(apply) {
@@ -89,16 +89,80 @@ function vulnPolicyRoute(logger, config, action, arg1, arg2) {
             return vulnPolicyList(logger, config, arg1);
         break;
         case "create":
-            return vulnPolicyCreate(logger, config, arg1);
-        break;
+            // Load up the custom policy definition from the supplied file
+            if (!_.isString(arg1)) {
+                logger.error('missing required path to JSON file containing custom scoring policy definition');
+                return false;
+            }
+    
+            var fs = require('fs');
+            fs.readFile(arg1, 'utf8', function (err, data) {
+                if (err) {  // Error during reading the file.
+                    logger.error('reading JSON policy file => ' + err);
+                    return false;
+                }
+
+                try {   // Try to parse the data from the file into JSON.
+                    data = JSON.parse(data);
+                    return vulnPolicyCreate(logger, config, data);
+                } catch (err) {     // Error during parsing of data.
+                    logger.error('parsing policy file => ' + err);
+                    return false;
+                };
+            });
+        break;        
         case "update":
-            return vulnPolicyUpdate(logger, config, arg1, arg2);
+            // Load up the custom policy definition from the supplied file
+            if (!_.isString(arg2)) {
+                logger.error('missing required path to JSON file containing policy definition');
+                return false;
+            }
+                
+            var fs = require('fs');
+            fs.readFile(arg2, 'utf8', function (err, data) {
+                console.log("*** HERE ***");
+                if (err) {  // Error during reading the file.
+                    logger.error('reading JSON policy file => ' + err);
+                    return false;
+                }
+
+                try {   // Try to parse the data from the file into JSON.
+                    console.log("*** HERE 2 ***");
+                    data = JSON.parse(data);
+                    console.log("*** HERE 3 ***");
+
+                    return vulnPolicyUpdate(logger, config, arg1, data);
+                } catch (err) {     // Error during parsing of data.
+                    logger.error('parsing policy file => ' + err);
+                    return false;
+                };
+            });
         break;
         case "delete":
             return vulnPolicyDelete(logger, config, arg1);
         break;
         case "apply":
-            return vulnPolicyApply(logger, config, arg1, arg2);
+           // Load up the custom policy definition from the supplied file
+            if (!_.isString(arg1)) {
+                logger.error('missing required path to JSON file containing apply definition');
+                return false;
+            }
+    
+            var fs = require('fs');
+            fs.readFile(arg1, 'utf8', function (err, data) {
+                if (err) {  // Error during reading the file.
+                    logger.error('reading JSON apply file => ' + err);
+                    return false;
+                }
+
+                try {   // Try to parse the data from the file into JSON.
+                    data = JSON.parse(data);
+                    return vulnPolicyApply(logger, config, data);
+                } catch (err) {     // Error during parsing of data.
+                    logger.error('parsing apply file => ' + err);
+                    return false;
+                };
+            });            
         break;
         case "fetch":
             return vulnPolicyFetch(logger, config, arg1);
@@ -157,40 +221,25 @@ function vulnPolicyList(logger, config, policyID, out) {
     @param {string} config.host - host to send the request to
     @param {string} config.port - port to send the request to
     @param {string} config.apikey - apikey to use for the request
-    @param {string} jsonFile - local json file containing the policy definition.
+    @param {object } policy - json object containing the policy definition
     @param {function} [out] - output processing function. If not specified, dump to console
 **/
-function vulnPolicyCreate(logger, config, jsonFile, out) {
+function vulnPolicyCreate(logger, config, policy, out) {
     // Need to supply a path to the policy file
-    if (!_.isString(jsonFile)) {
-        logger.error('missing required path to JSON file containing custom scoring policy definition.');
+    if (!_.isObject(policy)) {
+        logger.error('policy definition is not an object');
         return false;
     }
-    logger.info('Policy file => ' + jsonFile);
+    logger.info('Policy file => ' + policy);
 
-    // Load up the custom policy definition from the supplied file
-    var fs = require('fs');
-    fs.readFile(jsonFile, 'utf8', function (err, data) {
-        if (err) {  // Error during reading the file.
-            logger.error('reading JSON policy file => ' + err);
-            return false;
-        }
+    if (!out) {
+        console.log("Creating custom policy...");
+        outputCustomPolicies([ policy ], true);
+    }
 
-        try {   // Try to parse the data from the file into JSON.
-            data = JSON.parse(data);
-            if (!out) {
-                console.log("Creating custom policy...");
-                outputCustomPolicies([ data ], true);
-            }
-        } catch (err) {     // Error during parsing of data.
-            logger.error('parsing policy file => ' + err);
-            return false;
-        };
-        
-        // Now perform the post.
-        var post = new httpHelper.post(logger, config, '/api/vuln_custom_policy', out);
-        return post.execute(data);
-    });
+    // Now perform the post.
+    var post = new httpHelper.post(logger, config, '/api/vuln_custom_policy', out);
+    return post.execute(policy);
 }
 
 /**
@@ -201,10 +250,10 @@ function vulnPolicyCreate(logger, config, jsonFile, out) {
     @param {string} config.port - port to send the request to
     @param {string} config.apikey - apikey to use for the request
     @param {number} policyID - policy to update
-    @param {string} jsonFile - local json file containing the policy definition
+    @param {string} policy - json object containing the policy definition
     @param {function} [out] - output processing function. If not specified, dump to console
 **/
-function vulnPolicyUpdate(logger, config, policyID, jsonFile, out) {
+function vulnPolicyUpdate(logger, config, policyID, policy, out) {
     // Need to supply a valid policyID
     policyID = parseInt(policyID);
     if (!_.isNumber(policyID) || _.isNaN(policyID)) {
@@ -214,36 +263,21 @@ function vulnPolicyUpdate(logger, config, policyID, jsonFile, out) {
     logger.info('Policy ID => ' + policyID);
     var path = '/api/vuln_custom_policy/' + policyID;
 
-    // Need to supply a path to the policy file
-    if (!_.isString(jsonFile)) {
-        logger.error('missing required path to JSON file containing custom scoring policy definition.');
+    // Need to supply a valid policy object
+    if (!_.isObject(policy)) {
+        logger.error('policy definition is not an object.');
         return false;
     }
-    logger.info('Policy file => ' + jsonFile);
+    logger.info('Policy => ' + policy);
 
-    // Load up the custom policy definition from the supplied file
-    var fs = require('fs');
-    fs.readFile(jsonFile, 'utf8', function (err, data) {
-        if (err) {  // Error during reading the file.
-            logger.error('reading JSON policy file => ' + err);
-            return false;
-        }
-
-        try {   // Try to parse the data from the file into JSON.
-            data = JSON.parse(data);
-            if (!out) {
-                console.log("Updating custom policy %d...", policyID);
-                outputCustomPolicies([ data ], true);
-            }
-        } catch (err) {     // Error during parsing of data.
-            logger.error('parsing policy file => ' + err);
-            return false;
-        };
-        
-        // Now perform the put.
-        var put = new httpHelper.put(logger, config, path, out);
-        return put.execute(data);
-    });
+    if (!out) {
+        console.log("Updating custom policy %d...", policyID);
+        outputCustomPolicies([ policy ], true);
+    }
+    
+    // Now perform the put.
+    var put = new httpHelper.put(logger, config, path, out);
+    return put.execute(policy);
 }
 
 /**
@@ -279,10 +313,10 @@ function vulnPolicyDelete(logger, config, policyID, out) {
     @param {string} config.port - port to send the request to
     @param {string} config.apikey - apikey to use for the request
     @param {number} policyID - policy to update
-    @param {string} jsonFile - local json file containing the list of apps/sites
+    @param {object} set - json object containing the list of apps/sites
     @param {function} [out] - output processing function. If not specified, dump to console
 **/
-function vulnPolicyApply(logger, config, policyID, jsonFile, out) {
+function vulnPolicyApply(logger, config, policyID, set, out) {
    // Need to supply a valid policyID
     policyID = parseInt(policyID);
     if (!_.isNumber(policyID) || _.isNaN(policyID)) {
@@ -292,36 +326,21 @@ function vulnPolicyApply(logger, config, policyID, jsonFile, out) {
     logger.info('Policy ID => ' + policyID);
     var path = '/api/vuln_custom_policy/' + policyID + '/assets';
 
-    // Need to supply a path to the list of sites/applications
-    if (!_.isString(jsonFile)) {
-        logger.error('missing required path to JSON file containing list of sites and applications to apply this policy to.');
+   // Need to supply a valid set object
+    if (!_.isObject(set)) {
+        logger.error('set definition is not an object.');
         return false;
     }
-    logger.info('Apply file => ' + jsonFile);
+    logger.info('Set => ' + set);
 
-    // Load up the custom policy definition from the supplied file
-    var fs = require('fs');
-    fs.readFile(jsonFile, 'utf8', function (err, data) {
-        if (err) {  // Error during reading the file.
-            logger.error('reading JSON apply file => ' + err);
-            return false;
-        }
-
-        try {   // Try to parse the data from the file into JSON.
-            data = JSON.parse(data);
-            if (!out) {
-                console.log("Applying custom policy %d...", policyID);
-                outputCustomApplication(data);
-            }
-        } catch (err) {     // Error during parsing of data.
-            logger.error('parsing policy application file => ' + err);
-            return false;
-        };
-        
-        // Now perform the put.
-        var put = new httpHelper.put(logger, config, path, out);
-        return put.execute(data);
-    });
+    if (!out) {
+        console.log("Applying custom policy %d...", policyID);
+        outputCustomApplication(set);
+    }
+    
+    // Now perform the put.
+    var put = new httpHelper.put(logger, config, path, out);
+    return put.execute(set);
 }
 
 /**
@@ -393,7 +412,7 @@ exports.fetch = vulnPolicyFetch;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Thu Mar 12 2015 09:55:56 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 18 2015 11:29:44 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

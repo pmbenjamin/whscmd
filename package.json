@@ -1,7 +1,7 @@
 {
   "name": "whscmd",
   "preferGlobal": "true",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "WhiteHat Security Inc <support@whitehatsec.com>",
   "description": "A utility for interacting with the WhiteHat Sentinel API.",
   "contributors": [

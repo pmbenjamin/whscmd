@@ -1,0 +1,15 @@
+{
+	"username": "foo@bar.com",
+	"client_id": "1",
+	"first_name": "Foo",
+	"last_name": "Bar",
+	"role": "Admin",
+	"type": "sentinel",
+	"address": "1011 Maserati Drive",
+	"city": "Teslaville",
+	"state": "CA",
+	"zipcode": "95054",
+	"country": "USA",
+	"phone": "+1 408 555 1212",
+	"fax": "+1 408 555 1111"
+} 
