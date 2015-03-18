@@ -4,7 +4,6 @@
 	"first_name": "Foo",
 	"last_name": "Bar",
 	"role": "Admin",
-	"type": "sentinel",
 	"address": "1011 Maserati Drive",
 	"city": "Teslaville",
 	"state": "CA",
