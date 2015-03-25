@@ -10,7 +10,7 @@ WHS Command
 Current Status
 --------------
 
-[**ALPHA**] v0.0.5
+[**ALPHA**] v0.0.6
 
 ###Release Notes
 

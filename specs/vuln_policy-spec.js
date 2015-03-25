@@ -92,7 +92,7 @@ describe("Vuln Policies", function () {
 
 	describe("#update <policyID> <jsonFile>", function () {
 		it("should update a policy", function (done) {
-			console.log("whscmd vuln_policy update", config.vuln_policy.updateFile, "-k", config.header.apikey,
+			console.log("whscmd vuln_policy update", vulnPolicyID, config.vuln_policy.updateFile, "-k", config.header.apikey,
 				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			loadJSON(config.vuln_policy.updateFile, function (updateData) {
 				vuln_policy.update(logger, config.header, vulnPolicyID, updateData, function (status, data) {
@@ -109,7 +109,7 @@ describe("Vuln Policies", function () {
 
 	describe("#apply <policyID> <jsonFile>", function () {
 		it("should apply a policy to a set of sites", function (done) {
-			console.log("whscmd vuln_policy apply", config.vuln_policy.applyFile, "-k", config.header.apikey,
+			console.log("whscmd vuln_policy apply", vulnPolicyID, config.vuln_policy.applyFile, "-k", config.header.apikey,
 				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			loadJSON(config.vuln_policy.applyFile, function (applyData) {
 				vuln_policy.apply(logger, config.header, vulnPolicyID, applyData, function (status, data) {
@@ -126,7 +126,7 @@ describe("Vuln Policies", function () {
 
 	describe("#fetch <policyID>", function () {
 		it("should fetch which sites have a policy applied", function (done) {
-			console.log("whscmd vuln_policy fetch -k", config.header.apikey,
+			console.log("whscmd vuln_policy fetch", vulnPolicyID, "-k", config.header.apikey,
 				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			vuln_policy.fetch(logger, config.header, vulnPolicyID, function (status, data) {
 				console.log("\tPolicyID: ", vulnPolicyID);
@@ -139,9 +139,9 @@ describe("Vuln Policies", function () {
 		});
 	});
 
-	describe("#delete", function () {
+	describe("#delete <policyID>", function () {
 		it("should not delete a policy if it has been applied to sites", function (done) {
-			console.log("whscmd vuln_policy delete -k", config.header.apikey,
+			console.log("whscmd vuln_policy delete", vulnPolicyID, "-k", config.header.apikey,
 				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			vuln_policy.delete(logger, config.header, vulnPolicyID, function (status, data) {
 				console.log("\tPolicyID: ", vulnPolicyID);
@@ -154,7 +154,7 @@ describe("Vuln Policies", function () {
 
 	describe("#apply <policyID> <jsonFile>", function () {
 		it("should detach a policy from all sites", function (done) {
-			console.log("whscmd vuln_policy apply", config.vuln_policy.detachFile, "-k", config.header.apikey,
+			console.log("whscmd vuln_policy apply", vulnPolicyID, config.vuln_policy.detachFile, "-k", config.header.apikey,
 				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			loadJSON(config.vuln_policy.detachFile, function (detachData) {
 				vuln_policy.apply(logger, config.header, vulnPolicyID, detachData, function (status, data) {
@@ -171,7 +171,7 @@ describe("Vuln Policies", function () {
 
 	describe("#delete", function () {
 		it("should delete a policy", function (done) {
-			console.log("whscmd vuln_policy delete -k", config.header.apikey,
+			console.log("whscmd vuln_policy delete", vulnPolicyID, "-k", config.header.apikey,
 				"-t", config.header.host, "-p", config.header.port, "-v", config.log.level);
 			vuln_policy.delete(logger, config.header, vulnPolicyID, function (status, data) {
 				console.log("\tPolicyID: ", vulnPolicyID);

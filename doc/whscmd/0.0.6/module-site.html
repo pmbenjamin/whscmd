@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: user</title>
+    <title>JSDoc: Module: site</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: user</h1>
+    <h1 class="page-title">Module: site</h1>
 
     
 
@@ -61,14 +61,14 @@
 
     
 
-    <h4 class="name" id="~outputUser"><span class="type-signature">(protected, inner) </span>outputUser<span class="signature">(array, keys<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~outputSites"><span class="type-signature">(protected, inner) </span>outputSites<span class="signature">(array, keys<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Format and output user information.
+    Format and output site information.
 </div>
 
 
@@ -133,7 +133,7 @@
 
             
 
-            <td class="description last">of user definitions or a single user definition</td>
+            <td class="description last">of site definitions or a single site definition</td>
         </tr>
 
     
@@ -166,7 +166,7 @@
 
             
 
-            <td class="description last">array of key names to print out. Default is ["id", "first_name", "last_name", "username", "company", "role", "client_id"].</td>
+            <td class="description last">array of key names to print out. Default is ["id", "label", "scan_status"].</td>
         </tr>
 
     
@@ -207,7 +207,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">user.js</a>, <a href="user.js.html#line8">line 8</a>
+        <a href="site.js.html">site.js</a>, <a href="site.js.html#line8">line 8</a>
     </li></ul></dd>
     
 
@@ -238,14 +238,14 @@
 
     
 
-    <h4 class="name" id="~userCreate"><span class="type-signature">(inner) </span>userCreate<span class="signature">(logger, config, user, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~siteCreate"><span class="type-signature">(inner) </span>siteCreate<span class="signature">(logger, config, site, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Create a new user from the specified json file.
+    Create a new site from the specified json object.
 </div>
 
 
@@ -438,7 +438,7 @@
 
         <tr>
             
-                <td class="name"><code>user</code></td>
+                <td class="name"><code>site</code></td>
             
 
             <td class="type">
@@ -462,7 +462,7 @@
 
             
 
-            <td class="description last">json object containing the user definition</td>
+            <td class="description last">json object containing the site definition</td>
         </tr>
 
     
@@ -536,7 +536,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">user.js</a>, <a href="user.js.html#line142">line 142</a>
+        <a href="site.js.html">site.js</a>, <a href="site.js.html#line168">line 168</a>
     </li></ul></dd>
     
 
@@ -567,14 +567,14 @@
 
     
 
-    <h4 class="name" id="~userDelete"><span class="type-signature">(inner) </span>userDelete<span class="signature">(logger, config, userID, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~siteEntryPoints"><span class="type-signature">(inner) </span>siteEntryPoints<span class="signature">(logger, config, <siteID>, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Delete an existing user
+    List entry points for a site
 </div>
 
 
@@ -767,7 +767,7 @@
 
         <tr>
             
-                <td class="name"><code>userID</code></td>
+                <td class="name"><code><siteID></code></td>
             
 
             <td class="type">
@@ -791,7 +791,7 @@
 
             
 
-            <td class="description last">user to delete</td>
+            <td class="description last">site to list entry points for.</td>
         </tr>
 
     
@@ -865,7 +865,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">user.js</a>, <a href="user.js.html#line209">line 209</a>
+        <a href="site.js.html">site.js</a>, <a href="site.js.html#line118">line 118</a>
     </li></ul></dd>
     
 
@@ -896,14 +896,14 @@
 
     
 
-    <h4 class="name" id="~userList"><span class="type-signature">(inner) </span>userList<span class="signature">(logger, config, userID<span class="signature-attributes">opt</span>, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~siteList"><span class="type-signature">(inner) </span>siteList<span class="signature">(logger, config, siteID<span class="signature-attributes">opt</span>, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    List users or a single user
+    List sites or a single site
 </div>
 
 
@@ -1096,7 +1096,7 @@
 
         <tr>
             
-                <td class="name"><code>userID</code></td>
+                <td class="name"><code>siteID</code></td>
             
 
             <td class="type">
@@ -1122,7 +1122,7 @@
 
             
 
-            <td class="description last">user to list. If not specified, list all users</td>
+            <td class="description last">site to list. If not specified, list all sites</td>
         </tr>
 
     
@@ -1196,7 +1196,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">user.js</a>, <a href="user.js.html#line102">line 102</a>
+        <a href="site.js.html">site.js</a>, <a href="site.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -1227,14 +1227,14 @@
 
     
 
-    <h4 class="name" id="~userRoute"><span class="type-signature">(inner) </span>userRoute<span class="signature">(logger, config, action, arg1, arg2)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~siteRoute"><span class="type-signature">(inner) </span>siteRoute<span class="signature">(logger, config, action, arg1)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Routing function for user commands
+    Routing function for site commands
 </div>
 
 
@@ -1434,35 +1434,6 @@
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>arg2</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-|
-
-<span class="param-type">string</span>
-|
-
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">variable argument of multiple types depending on the action</td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -1500,367 +1471,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">user.js</a>, <a href="user.js.html#line31">line 31</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~userUpdate"><span class="type-signature">(inner) </span>userUpdate<span class="signature">(logger, config, userID, user, out<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Update an existing user from the specified json file
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>logger</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">logging function (must support verbose, info, etc.)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>config</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">config for the HTTP post</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>config.host</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">host to send the request to</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>config.port</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">port to send the request to</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>config.apikey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">apikey to use for the request</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>userID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">user to update</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>user</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">json object containing the user definition</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>out</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">output processing function. If not specified, dump to console</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">user.js</a>, <a href="user.js.html#line172">line 172</a>
+        <a href="site.js.html">site.js</a>, <a href="site.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -1908,7 +1519,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Wed Mar 18 2015 11:29:44 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Tue Mar 24 2015 17:00:15 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
