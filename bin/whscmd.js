@@ -1,9 +1,11 @@
 #!/usr/bin/env node
+
 // whscmd: a utility for interfacing with the WhiteHat Sentinel API
 var httpHelper = require('../lib/httphelper');
 var program = require('commander');
 var _ = require('underscore');
 var winston = require('winston');
+var whs = require('../lib/index');
 
 var logger = new winston.Logger({
     transports: [
@@ -14,16 +16,6 @@ var logger = new winston.Logger({
         })
     ]
 });
-
-// Load up command routers and functions.
-var user = require('./user');
-var site = require('./site');
-var app = require('./app');
-var vuln_class = require('./vuln_class');
-var vuln_policy = require('./vuln_policy');
-
-var HOST = 'sentinel.whitehatsec.com';
-var PORT = 443;
 
 /** Preprocessing step for all commands.
   * @function pre
@@ -41,43 +33,43 @@ function pre() {
 
 program.version('0.0.5')
         .option('-v, --verbosity <level>', 'specify output verbosity (verbose|info|warn|error|silent) [error]', 'error')
-        .option('-t, --host <host>', 'specify an alternate host [' + HOST + ']', HOST)
+        .option('-t, --host <host>', 'specify an alternate host [' + whs.HOST + ']', whs.HOST)
         .option('-k, --apikey <apikey>', 'specify the WHS API key. THIS IS REQUIRED.')
-        .option('-p, --port <port>', 'specify an alternate port [' + PORT + ']', PORT);
+        .option('-p, --port <port>', 'specify an alternate port [' + whs.PORT + ']', whs.PORT);
 
 program.command('user <action> [arg1] [arg2]')
-    .description(user.description)
+    .description(whs.user.description)
     .action(function (action, arg1, arg2) {
         var options = pre();
-        return user.route(logger, options, action, arg1, arg2);
+        return whs.user.route(logger, options, action, arg1, arg2);
     });
 
 program.command('site <action> [arg1] [arg2]')
-    .description(site.description)
+    .description(whs.site.description)
     .action(function (action, arg1, arg2) {
         var options = pre();
-        return site.route(logger, options, action, arg1, arg2);
+        return whs.site.route(logger, options, action, arg1, arg2);
     });
 
 program.command('app <action> [appID]')
-    .description(app.description)
+    .description(whs.app.description)
     .action(function (action, arg1) {
         var options = pre();
-        return app.route(logger, options, action, arg1);
+        return whs.app.route(logger, options, action, arg1);
     });
 
 program.command('vuln_class <action> <client_id>')
-    .description(vuln_class.description)
+    .description(whs.vuln_class.description)
     .action(function (action, arg1) {
         var options = pre();
-        return vuln_class.route(logger, options, action, arg1);
+        return whs.vuln_class.route(logger, options, action, arg1);
     });
 
 program.command('vuln_policy <action> [arg1] [arg2]')
-    .description(vuln_policy.description)
+    .description(whs.vuln_policy.description)
     .action(function (action, arg1, arg2) {
         var options = pre();
-        return vuln_policy.route(logger, options, action, arg1, arg2);
+        return whs.vuln_policy.route(logger, options, action, arg1, arg2);
     });
 
 program.command('*')
